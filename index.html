@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pour Charlotte</title>
+    <style>
+        /* --- Le Style (CSS) - Inchangé --- */
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: linear-gradient(to right, #ffdde1, #ee9ca7);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 90%;
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            color: #d63384;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        p {
+            font-size: 1.2em;
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        .gif-container img {
+            width: 150px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .final-photo {
+            width: 80%;
+            max-width: 400px;
+            height: auto;
+            border-radius: 20px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            margin: 20px auto;
+            display: block;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            min-height: 60px; 
+            position: relative;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease; 
+            z-index: 100;
+        }
+
+        #yesBtn {
+            background-color: #28a745;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(40, 167, 69, 0.2);
+        }
+
+        #noBtn {
+            background-color: #dc3545;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(220, 53, 69, 0.2);
+        }
+        
+        /* Style pour le bouton recharger sur la page énervée */
+        .retry-btn {
+            background-color: #d63384;
+            color: white;
+            margin-top: 20px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Bonjour Charlotte ❤️</h1>
+        <p>Veux-tu être ma Valentine ?</p>
+        
+        <div class="gif-container">
+            <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExN3l5a3Zzb3F4Y2cyYnR3eXF6bm15eG55eG55eG55eG55eG55eCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/cLS1cfxvGOPVpf9g3y/giphy.gif" alt="Cute heart">
+        </div>
+
+        <div class="buttons">
+            <button id="yesBtn">Oui !</button>
+            <button id="noBtn">Non</button>
+        </div>
+    </div>
+
+    <script>
+        /* --- La Logique (JavaScript) --- */
+        const noBtn = document.getElementById('noBtn');
+        const yesBtn = document.getElementById('yesBtn');
+        
+        let yesScale = 1; // Taille initiale du bouton Oui
+        let noMoveCount = 0; // NOUVEAU : Compteur de mouvements du Non
+
+        // Fonction pour afficher la page "Énervée"
+        function showAngryPage() {
+             document.body.innerHTML = `
+                <div class="container">
+                    <h1>Mauvaise REPONSE ! 😠</h1>
+                    <img src="https://media.giphy.com/media/11tTNkNy1SdXGg/giphy.gif" alt="Angry cat judging you" class="final-photo" style="width: 300px;">
+                    <p>Ce n'est pas la bonne réponse ! On recommence jusqu'à ce que tu trouves la bonne touche. 😤</p>
+                    <button class="retry-btn" onclick="location.reload()">Réessayer</button>
+                </div>
+            `;
+        }
+
+        // Fonction pour bouger le bouton "Non"
+        function moveButton() {
+            // On incrémente le compteur
+            noMoveCount++;
+
+            // SI on a atteint 4 mouvements : on arrête le jeu
+            if (noMoveCount >= 5) {
+                // On supprime les événements qui font bouger le bouton
+                noBtn.removeEventListener('mouseenter', moveButton);
+                noBtn.removeEventListener('click', moveButton);
+                
+                // On change le style du bouton pour montrer qu'il est cliquable
+                noBtn.style.backgroundColor = "#555"; //
+                noBtn.innerText = "Non 😡";
+                noBtn.style.cursor = "pointer";
+
+                // On ajoute le NOUVEL événement : le clic qui rend énervé
+                noBtn.addEventListener('click', showAngryPage);
+
+                // On s'arrête là, on ne le fait pas bouger cette fois-ci
+                return;
+            }
+
+            // --- SINON (si moins de 4 mouvements), on continue comme avant ---
+
+            // 1. Position fixed
+            noBtn.style.position = 'fixed';
+
+            // 2. Calcul des dimensions
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            const btnWidth = noBtn.offsetWidth;
+            const btnHeight = noBtn.offsetHeight;
+
+            // 3. Nouvelle position aléatoire
+            const newX = Math.random() * (windowWidth - btnWidth - 100) + 50;
+            const newY = Math.random() * (windowHeight - btnHeight - 100) + 50;
+
+            // 4. Application des coordonnées
+            noBtn.style.left = newX + 'px';
+            noBtn.style.top = newY + 'px';
+            
+            // 5. Faire grossir le bouton OUI
+            yesScale += 0.2; 
+            yesBtn.style.transform = `scale(${yesScale})`;
+            yesBtn.style.zIndex = 999; 
+        }
+
+        // Événements initiaux (qui font bouger le bouton)
+        noBtn.addEventListener('mouseenter', moveButton);
+        noBtn.addEventListener('click', moveButton); // Pour mobile
+
+        // Clic sur Oui (inchangé)
+        yesBtn.addEventListener('click', function() {
+            document.body.innerHTML = `
+                <div class="container">
+                    <h1>Je t'aime de touuut l'amour 💖</h1>
+                    <img src="notrephoto.jpg" alt="Photo de nous" class="final-photo" onerror="this.src='https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMWI5anp1a29yMjU2cmw0Y2w3dmVvcjI4b3VtMzlybzk2N201NHhmMCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/xR5cPyPoL5HVXSphqA/giphy.gif'">
+                    <p>(Je savais que tu dirais oui 😊)</p>
+                </div>
+            `;
+        });
+    </script>
+</body>
+</html>
